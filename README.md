@@ -31,16 +31,15 @@ Clone this repo and install it into your Node-RED environment:
 
 ```bash
 cd ~/.node-red
-npm install /path/to/this/repo
+npm install https://github.com/jacowisper/node-red-contrib-rxdb
 ```
 
-Or from your own GitHub repo (once published):
+Then restart Node-RED:
 
 ```bash
-npm install jvdwalt/node-red-contrib-rxdb
+node-red-stop
+node-red-start
 ```
-
-Then restart Node-RED.
 
 ---
 
@@ -68,7 +67,7 @@ The node currently outputs a test message to confirm MongoDB + RxDB are connecte
 
 ## 💬 Development Notes
 
-This project is being built live by [@jvdwalt](https://github.com/jvdwalt) and is intended as a modular, production-ready base for RxDB integration in Node-RED.
+This project is being built live by [@jacowisper](https://github.com/jacowisper) and is intended as a modular, production-ready base for RxDB integration in Node-RED.
 
 Expect rapid iteration and frequent improvements.
 
@@ -77,7 +76,7 @@ Expect rapid iteration and frequent improvements.
 ## 🤝 Contributing
 
 Pull requests, ideas, and issues are welcome!  
-Start by opening an [Issue](https://github.com/your-repo/issues) or fork the repo.
+Start by opening an [Issue](https://github.com/jacowisper/node-red-contrib-rxdb/issues) or fork the repo.
 
 ---
 
