@@ -1,0 +1,25 @@
+{
+  "name": "node-red-contrib-rxdb",
+  "version": "1.0.0",
+  "description": "A Node-RED custom node for testing RxDB integration with MongoDB",
+  "main": "rxdb.js",
+  "keywords": [
+    "node-red",
+    "rxdb",
+    "custom-node",
+    "database"
+  ],
+  "author": "Jaco vd Walt",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/runtime": "^7.27.0",
+    "mongodb": "^6.12.0",
+    "rxdb": "^16.9.0"
+  },
+  "node-red": {
+    "nodes": {
+      "rxdb": "rxdb.js",
+      "rxdb-config": "rxdb-config.js"
+    }
+  }
+}

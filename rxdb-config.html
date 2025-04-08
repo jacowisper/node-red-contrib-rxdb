@@ -1,0 +1,28 @@
+<script type="text/javascript">
+    RED.nodes.registerType('rxdb-config', {
+        category: 'config',
+        defaults: {
+            name: { value: "" },
+            mongoUrl: { value: "", required: true },
+            dbName: { value: "", required: true }
+        },
+        label: function () {
+            return this.name || "RxDB Config";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="rxdb-config">
+    <div class="form-row">
+      <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-config-input-name">
+    </div>
+    <div class="form-row">
+      <label for="node-config-input-mongoUrl"><i class="fa fa-link"></i> Mongo URL</label>
+      <input type="text" id="node-config-input-mongoUrl" placeholder="mongodb://localhost:27017">
+    </div>
+    <div class="form-row">
+      <label for="node-config-input-dbName"><i class="fa fa-database"></i> Database Name</label>
+      <input type="text" id="node-config-input-dbName" placeholder="my_rxdb">
+    </div>
+  </script>

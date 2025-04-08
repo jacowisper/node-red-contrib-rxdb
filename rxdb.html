@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    RED.nodes.registerType('rxdb', {
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value: "" },
+            rxdbConfig: { type: "rxdb-config", required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-database",
+        label: function () {
+            return this.name || "rxdb";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="rxdb">
+    <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name">
+    </div>
+    <div class="form-row">
+      <label for="node-input-rxdbConfig"><i class="fa fa-cog"></i> RxDB Config</label>
+      <input type="text" id="node-input-rxdbConfig">
+    </div>
+  </script>
+
+<script type="text/html" data-help-name="rxdb">
+    <p>This node connects to an RxDB database backed by MongoDB.</p>
+    <p>Use the RxDB Config node to define connection parameters.</p>
+  </script>
