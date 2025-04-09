@@ -142,7 +142,7 @@ Dynamically register collections:
   "calendarEvents": {
     "schema": { ... },
     "replicate": true,
-    "replicationUrl": "https://myhost/replCalendarEvents/0"
+    "replicationUrl": "https://myhost/tickets/0"
   }
 }
 ```
