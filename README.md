@@ -38,7 +38,6 @@ To use this project with FoundationDB:
 sudo apt update
 wget https://github.com/apple/foundationdb/releases/download/7.2.5/foundationdb-clients_7.2.5-1_amd64.deb
 sudo mkdir -p /var/lib/foundationdb
-sudo chown foundationdb:foundationdb /var/lib/foundationdb
 sudo dpkg -i foundationdb-clients_7.2.5-1_amd64.deb
 ```
 
