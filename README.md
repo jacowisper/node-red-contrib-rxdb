@@ -158,7 +158,7 @@ Dynamically register collections:
 - 🛠 No external DB config nodes — flow-driven logic only
 
 ---
-
+![alt text](image.png)
  
 ---
 
