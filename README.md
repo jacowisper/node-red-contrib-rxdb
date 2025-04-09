@@ -36,10 +36,10 @@ To use this project with FoundationDB:
 
 ```bash
 sudo apt update
-wget https://github.com/apple/foundationdb/releases/download/7.3.56/foundationdb-clients_7.3.56-1_amd64.deb
+wget https://github.com/apple/foundationdb/releases/download/7.2.5/foundationdb-clients_7.2.5-1_amd64.deb
 sudo mkdir -p /var/lib/foundationdb
 sudo chown foundationdb:foundationdb /var/lib/foundationdb
-sudo dpkg -i foundationdb-server_7.3.56-1_amd64.deb
+sudo dpkg -i foundationdb-clients_7.2.5-1_amd64.deb
 ```
 
 ### ✅ 2. Run a FoundationDB Server (API Version 7.2)
@@ -55,9 +55,12 @@ docker run -d \
   foundationdb/foundationdb:7.2.5
 ```
 
-Then copy the cluster file to your host system:
+Then create and copy the cluster file to your host system:
 
 ```bash
+docker exec -it foundationdb fdbcli
+configure new single ssd
+exit
 docker cp foundationdb:/var/fdb/fdb.cluster /opt/fdb-conf/fdb.cluster
 sudo cp /opt/fdb-conf/fdb.cluster /etc/foundationdb/fdb.cluster
 ```
