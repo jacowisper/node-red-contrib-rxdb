@@ -36,7 +36,10 @@ To use this project with FoundationDB:
 
 ```bash
 sudo apt update
-sudo apt install -y foundationdb-clients foundationdb-dev
+wget https://github.com/apple/foundationdb/releases/download/7.3.56/foundationdb-clients_7.3.56-1_amd64.deb
+sudo mkdir -p /var/lib/foundationdb
+sudo chown foundationdb:foundationdb /var/lib/foundationdb
+sudo dpkg -i foundationdb-server_7.3.56-1_amd64.deb
 ```
 
 ### ✅ 2. Run a FoundationDB Server (API Version 7.2)
