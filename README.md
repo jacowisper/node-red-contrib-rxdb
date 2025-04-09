@@ -93,7 +93,7 @@ Reads one or more collections:
 ```json
 {
   "rxdb": {
-    "collections": ["calendarEvents"],
+    "collections": ["tickets"],
     "limit": 10
   }
 }
@@ -119,7 +119,7 @@ Watches a collection for live updates:
 
 ```json
 {
-  "rxdb": { "collection": "calendarEvents" }
+  "rxdb": { "collection": "tickets" }
 }
 ```
 
