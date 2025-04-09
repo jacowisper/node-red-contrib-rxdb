@@ -1,85 +1,162 @@
 # node-red-contrib-rxdb
 
-> 🧪 A custom Node-RED node that connects to [RxDB](https://rxdb.info/) using a MongoDB backend.
+ 
 
-**⚠️ Work In Progress** — This project is currently in early development and actively evolving. Contributions, feedback, and testing are welcome!
+A custom Node-RED node set for building low-code, reactive database flows using [RxDB](https://rxdb.info/) backed by **FoundationDB**.
 
 ---
 
 ## 🚀 Overview
 
-This Node-RED node allows you to:
+This package includes Node-RED nodes that:
 
-- Connect to an RxDB instance backed by MongoDB
-- Share a connection using a reusable config node
-- Prepare for schema-based collections, inserts, queries, and sync
-- Integrate RxDB logic directly into your Node-RED flows
+- Dynamically manage RxDB collections and schemas at runtime
+- Support reading, writing, watching, and replicating changes
+- Use FoundationDB 7.2 as a fast, durable backend
+- Allow full flow-based control — no static schemas required!
 
 ---
 
-## 📦 Features
+## 📦 Included Nodes
 
-- 🧩 Config node (`rxdb-config`) stores MongoDB connection settings
-- ⚙️ Main node (`rxdb`) sets up the RxDB database
-- 🔌 Designed for future expansion (collections, sync, CRUD, etc.)
+| Node                   | Purpose                                       |
+|------------------------|-----------------------------------------------|
+| `rxdb-read`            | Query documents from one or more collections |
+| `rxdb-write`           | Insert documents into a collection            |
+| `rxdb-watch`           | Stream real-time changes from a collection   |
+| `rxdb-add-collections` | Dynamically add collections + enable replication |
+
+---
+
+## 🧰 Prerequisites
+
+To use this project with FoundationDB:
+
+### ✅ 1. Install FoundationDB Client Libraries
+
+```bash
+sudo apt update
+sudo apt install -y foundationdb-clients foundationdb-dev
+```
+
+### ✅ 2. Run a FoundationDB Server (API Version 7.2)
+
+```bash
+docker run -d \
+  --name foundationdb \
+  --hostname foundationdb \
+  --restart unless-stopped \
+  -v fdb-data:/var/lib/foundationdb/data \
+  -v /opt/fdb-conf:/etc/foundationdb \
+  -p 4500:4500 \
+  foundationdb/foundationdb:7.2.5
+```
+
+Then copy the cluster file to your host system:
+
+```bash
+docker cp foundationdb:/var/fdb/fdb.cluster /opt/fdb-conf/fdb.cluster
+sudo cp /opt/fdb-conf/fdb.cluster /etc/foundationdb/fdb.cluster
+```
 
 ---
 
 ## 🛠 Installation
 
-Clone this repo and install it into your Node-RED environment:
+From local directory:
 
 ```bash
 cd ~/.node-red
-npm install https://github.com/jacowisper/node-red-contrib-rxdb
+npm install /path/to/node-red-contrib-rxdb
 ```
 
 Then restart Node-RED:
 
 ```bash
-node-red-stop
-node-red-start
+node-red-restart
 ```
 
 ---
 
-## 🔧 Usage
+## 🔧 Node Usage
 
-1. Drag the `rxdb` node into your flow
-2. Create an `rxdb-config` with:
-   - MongoDB connection URL (e.g., `mongodb://localhost:27017`)
-   - Database name (e.g., `my_rxdb`)
-3. Deploy the flow and watch the connection status
+### 🟢 `rxdb-read`
 
-The node currently outputs a test message to confirm MongoDB + RxDB are connected.
+Reads one or more collections:
+
+```json
+{
+  "rxdb": {
+    "collections": ["calendarEvents"],
+    "limit": 10
+  }
+}
+```
+
+### ✏️ `rxdb-write`
+
+Writes a document to a collection:
+
+```json
+{
+  "rxdb": { "collection": "tickets" },
+  "payload": {
+    "id": "t-001",
+    "subject": "Test ticket"
+  }
+}
+```
+
+### 👀 `rxdb-watch`
+
+Watches a collection for live updates:
+
+```json
+{
+  "rxdb": { "collection": "calendarEvents" }
+}
+```
+
+Output:
+```json
+{
+  "payload": {
+    "event": "INSERT",
+    "doc": { ... }
+  }
+}
+```
+
+### 🛠️ `rxdb-add-collections`
+
+Dynamically register collections:
+
+```json
+{
+  "calendarEvents": {
+    "schema": { ... },
+    "replicate": true,
+    "replicationUrl": "https://myhost/replCalendarEvents/0"
+  }
+}
+```
 
 ---
 
-## 📚 Planned Features
+## 📚 Features
 
-- Schema-based collection definitions
-- Flow-controlled insert/find/update/delete
-- RxDB multi-instance and live change streaming
-- Sync support with CouchDB/GraphQL
-- Persistent storage of schema definitions
-
----
-
-## 💬 Development Notes
-
-This project is being built live by [@jacowisper](https://github.com/jacowisper) and is intended as a modular, production-ready base for RxDB integration in Node-RED.
-
-Expect rapid iteration and frequent improvements.
+- 🔁 FoundationDB 7.2 support via RxDB
+- 🧩 Dynamic schema injection at runtime
+- 📡 Replication support (RxDB replication-server plugin)
+- 🧠 Smart instance caching (one shared RxDB connection)
+- 🛠 No external DB config nodes — flow-driven logic only
 
 ---
 
-## 🤝 Contributing
-
-Pull requests, ideas, and issues are welcome!  
-Start by opening an [Issue](https://github.com/jacowisper/node-red-contrib-rxdb/issues) or fork the repo.
-
+ 
 ---
 
 ## 📄 License
 
-MIT © Jaco vd Walt
+**UNLICENSED**  
+No warranties. No attribution required. No restrictions.

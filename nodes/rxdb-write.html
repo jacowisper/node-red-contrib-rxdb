@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    RED.nodes.registerType('rxdb-write', {
+        category: 'RXDB',
+        color: '#d0e8d5',
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-database",
+        label: function () {
+            return this.name || "RxDB Write";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="rxdb-write">
+    <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="RxDB Write Node">
+    </div>
+  </script>
+
+<script type="text/html" data-help-name="rxdb-write">
+    <p>
+      Writes a document to an RxDB (FoundationDB-backed) collection.
+    </p>
+    <p>
+      Set <code>msg.rxdb.collection</code> to specify the collection.
+      Set <code>msg.payload</code> as the document to insert.
+    </p>
+  </script>

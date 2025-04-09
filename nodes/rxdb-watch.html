@@ -1,0 +1,40 @@
+<script type="text/javascript">
+    RED.nodes.registerType('rxdb-watch', {
+        category: 'RXDB',
+        color: '#e2c1f0',
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-eye",
+        label: function () {
+            return this.name || "RxDB Watch";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="rxdb-watch">
+    <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="RxDB Watch Node">
+    </div>
+  </script>
+
+<script type="text/html" data-help-name="rxdb-watch">
+    <p>
+      This node watches a specified RxDB collection and emits real-time updates whenever the data changes.
+    </p>
+    <p>
+      Pass <code>msg.rxdb.collection</code> to specify which collection to observe.
+    </p>
+    <p>
+      Output message will contain:
+    </p>
+    <pre><code>{
+    payload: {
+      event: "INSERT" | "UPDATE" | "DELETE",
+      doc: { ...changedDocument }
+    }
+  }</code></pre>
+  </script>

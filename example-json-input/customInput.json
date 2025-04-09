@@ -1,0 +1,133 @@
+{
+    "tickets": {
+        "schema": {
+            "title": "Tickets Schema",
+            "version": 0,
+            "description": "Schema for ticket data",
+            "primaryKey": "id",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "string"
+                },
+                "parent_ticket_id": {
+                    "type": "string"
+                },
+                "subscriber_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "expiryDate": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "dateRequired": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "ticketLatitude": {
+                    "type": "number"
+                },
+                "ticketLongitude": {
+                    "type": "number"
+                },
+                "ticketAddress": {
+                    "type": "string"
+                },
+                "selectedJobType": {
+                    "type": "string"
+                },
+                "selectedTemplateId": {
+                    "type": "string"
+                },
+                "selectedLocationId": {
+                    "type": "string"
+                },
+                "selectedServiceId": {
+                    "type": "string"
+                },
+                "jobTypeDurationHours": {
+                    "type": "number"
+                },
+                "jobTypeDurationMinutes": {
+                    "type": "number"
+                },
+                "zip_code": {
+                    "type": "string"
+                },
+                "street_1": {
+                    "type": "string"
+                },
+                "street_2": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "date": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "actionCode": {
+                                "type": "string"
+                            },
+                            "actionDescription": {
+                                "type": "string"
+                            },
+                            "userName": {
+                                "type": "string"
+                            },
+                            "userId": {
+                                "type": "string"
+                            },
+                            "actionLat": {
+                                "type": "number"
+                            },
+                            "actionLng": {
+                                "type": "number"
+                            }
+                        },
+                        "required": [
+                            "date",
+                            "actionCode",
+                            "userId"
+                        ]
+                    }
+                },
+                "dispatch": {
+                    "type": "object",
+                    "properties": {
+                        "calendarEventId": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "required": [
+                "id"
+            ]
+        },
+        "replicate": true,
+        "replicationUrl": "https://example.com/replTickets/0"
+    }
+}

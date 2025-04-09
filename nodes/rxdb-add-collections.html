@@ -1,0 +1,45 @@
+<script type="text/javascript">
+    RED.nodes.registerType('rxdb-add-collections', {
+        category: 'RXDB',
+        color: '#f9f2b5',
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-plus-square",
+        label: function () {
+            return this.name || "RxDB Add Collections";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="rxdb-add-collections">
+    <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="RxDB Add Collections Node">
+    </div>
+  </script>
+
+<script type="text/html" data-help-name="rxdb-add-collections">
+    <p>
+      This node dynamically adds new RxDB collections at runtime.
+    </p>
+    <p>
+      Input <code>msg.payload</code> must be an object of the format:
+    </p>
+    <pre><code>{
+        "calendarEvents": {
+          "schema": { ... },
+          "replicate": true,
+          "replicationUrl": "https://my-api/replCalendarEvents/0"
+        },
+        "logs": {
+          "schema": { ... },
+          "replicate": false
+        }
+      }</code></pre>
+    <p>
+      If a collection already exists, it is skipped. Output will indicate which were added or skipped.
+    </p>
+  </script>
