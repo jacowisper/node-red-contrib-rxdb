@@ -72,7 +72,7 @@ From local directory:
 
 ```bash
 cd ~/.node-red
-npm install /path/to/node-red-contrib-rxdb
+npm install https://github.com/jacowisper/node-red-contrib-rxdb.git
 ```
 
 Then restart Node-RED:
