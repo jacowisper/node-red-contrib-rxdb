@@ -38,7 +38,7 @@ module.exports = function (RED) {
 
                     collectionsToAdd[name] = {
                         schema: config.schema,
-                        autoMigrate: false
+                        autoMigrate: true
                     };
                 }
 

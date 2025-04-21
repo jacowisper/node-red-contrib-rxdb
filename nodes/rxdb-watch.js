@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+
 console.log('[rxdb] Loading watch node...');
 
 const { getRxDBInstance } = require('../lib/db');
@@ -6,8 +9,8 @@ module.exports = function (RED) {
     function RxDBWatchNode(config) {
         RED.nodes.createNode(this, config);
         const node = this;
-
-        let subscription;
+        node._subscription = null;
+        node._currentCollectionName = null;
 
         getRxDBInstance().then(db => {
             node.status({ fill: "grey", shape: "ring", text: "Waiting for collection" });
@@ -19,32 +22,46 @@ module.exports = function (RED) {
                     node.error("Missing msg.rxdb.collection");
                     return;
                 }
-
                 const collection = db.collections[collectionName];
                 if (!collection) {
                     node.error(`Collection '${collectionName}' does not exist`);
                     return;
                 }
 
-                // Only subscribe once per trigger
-                if (subscription) {
-                    subscription.unsubscribe();
+                // Only resubscribe if collection name changed
+                if (node._currentCollectionName === collectionName && node._subscription) {
+                    node.log(`[RxDB] Already watching '${collectionName}', skipping re-subscribe.`);
+                    return;
                 }
+
+                // Unsubscribe from any previous
+                if (node._subscription) {
+                    node._subscription.unsubscribe();
+                    node.log(`[RxDB] Unsubscribed from '${node._currentCollectionName}'`);
+                }
+
+                node._currentCollectionName = collectionName;
 
                 node.status({ fill: "blue", shape: "dot", text: `👀 Watching ${collectionName}` });
 
-                subscription = collection.find().$.subscribe(changeEvent => {
+                node._subscription = collection.find().$.subscribe(changeEvent => {
                     if (!changeEvent) return;
 
                     node.send({
-                        payload: changeEvent
+                        payload: changeEvent,
+                        collection: collectionName,
+                        topic: 'rxdb-change'
                     });
                 });
+
+
+                node.log(`[RxDB] Subscribed to '${collectionName}'`);
             });
 
             node.on('close', () => {
-                if (subscription) {
-                    subscription.unsubscribe();
+                if (node._subscription) {
+                    node._subscription.unsubscribe();
+                    node.log(`[RxDB] Unsubscribed from '${node._currentCollectionName}' on node close.`);
                 }
                 node.status({ fill: "grey", shape: "ring", text: "Stopped" });
             });
