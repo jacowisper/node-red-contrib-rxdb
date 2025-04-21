@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-rxdb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Node-RED custom node package for integrating RxDB with FoundationDB",
   "main": "lib/db.js",
   "keywords": [

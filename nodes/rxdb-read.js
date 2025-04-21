@@ -1,76 +1,79 @@
-// @ts-nocheck
-
-
-console.log('[rxdb] Loading watch node...');
+console.log('[rxdb] Loading read node...');
 
 const { getRxDBInstance } = require('../lib/db');
 
 module.exports = function (RED) {
-    function RxDBWatchNode(config) {
+    function RxDBReadNode(config) {
         RED.nodes.createNode(this, config);
         const node = this;
-        node._subscription = null;
-        node._currentCollectionName = null;
 
         getRxDBInstance().then(db => {
-            node.status({ fill: "grey", shape: "ring", text: "Waiting for collection" });
+            node.status({ fill: "green", shape: "dot", text: "Foundation ready" });
 
-            node.on('input', (msg) => {
-                const collectionName = msg?.rxdb?.collection;
-
-                if (!collectionName) {
+            node.on('input', async (msg) => {
+                if (!msg.rxdb || !(msg.rxdb.collection)) {
                     node.error("Missing msg.rxdb.collection");
                     return;
                 }
-                const collection = db.collections[collectionName];
+
+                let limit = 0;
+                let id = null;
+
+
+                if (msg.rxdb.limit && !Number.isNaN(parseInt(msg.rxdb.limit))) {
+                    limit = parseInt(msg.rxdb.limit);
+                }
+
+                if (msg.rxdb.id) {
+                    id = msg.rxdb.id;
+                }
+
+
+
+
+                const collection = db.collections[msg.rxdb.collection];
                 if (!collection) {
-                    node.error(`Collection '${collectionName}' does not exist`);
+                    node.error(`Collection '${msg.rxdb.collection}' does not exist`);
                     return;
                 }
 
-                // Only resubscribe if collection name changed
-                if (node._currentCollectionName === collectionName && node._subscription) {
-                    node.log(`[RxDB] Already watching '${collectionName}', skipping re-subscribe.`);
-                    return;
+                node.status({ fill: "yellow", shape: "dot", text: `Reading ${msg.rxdb.collection}` });
+                let docs = [];
+
+                if (msg.rxdb.count) {
+                    if (id) {
+                        const found = await collection.find().where('id').eq(id).exec();
+                        docs = found.length;
+                    } else if (msg.rxdb.selector) {
+                        const found = await collection.find({ selector: msg.rxdb.selector }).exec();
+                        docs = found.length;
+                    } else {
+                        docs = await collection.count().exec();
+                    }
+                } else {
+                    if (msg.rxdb.selector) {
+                        docs = await collection.find({ selector: msg.rxdb.selector }).limit(limit).exec();
+                    } else if (id) {
+                        docs = await collection.find().where('id').eq(id).limit(limit).exec();
+                    } else {
+                        docs = await collection.find().limit(limit).exec();
+                    }
                 }
 
-                // Unsubscribe from any previous
-                if (node._subscription) {
-                    node._subscription.unsubscribe();
-                    node.log(`[RxDB] Unsubscribed from '${node._currentCollectionName}'`);
-                }
-
-                node._currentCollectionName = collectionName;
-
-                node.status({ fill: "blue", shape: "dot", text: `👀 Watching ${collectionName}` });
-
-                node._subscription = collection.find().$.subscribe(changeEvent => {
-                    if (!changeEvent) return;
-
-                    node.send({
-                        payload: changeEvent,
-                        collection: collectionName,
-                        topic: 'rxdb-change'
-                    });
-                });
 
 
-                node.log(`[RxDB] Subscribed to '${collectionName}'`);
+
+
+                msg.payload = docs;
+
+                node.send(msg);
+                node.status({ fill: "green", shape: "dot", text: "Read complete" });
             });
-
-            node.on('close', () => {
-                if (node._subscription) {
-                    node._subscription.unsubscribe();
-                    node.log(`[RxDB] Unsubscribed from '${node._currentCollectionName}' on node close.`);
-                }
-                node.status({ fill: "grey", shape: "ring", text: "Stopped" });
-            });
-
         }).catch(err => {
             node.status({ fill: "red", shape: "ring", text: "DB Init failed" });
             node.error("RxDB init failed", err);
         });
     }
 
-    RED.nodes.registerType("rxdb-watch", RxDBWatchNode);
+    RED.nodes.registerType("rxdb-read", RxDBReadNode);
 };
