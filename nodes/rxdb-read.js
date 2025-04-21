@@ -1,49 +1,76 @@
-console.log('[rxdb] Loading read node...');
+// @ts-nocheck
+
+
+console.log('[rxdb] Loading watch node...');
 
 const { getRxDBInstance } = require('../lib/db');
 
 module.exports = function (RED) {
-    function RxDBReadNode(config) {
+    function RxDBWatchNode(config) {
         RED.nodes.createNode(this, config);
         const node = this;
+        node._subscription = null;
+        node._currentCollectionName = null;
 
         getRxDBInstance().then(db => {
-            node.status({ fill: "green", shape: "dot", text: "Foundation ready" });
+            node.status({ fill: "grey", shape: "ring", text: "Waiting for collection" });
 
-            node.on('input', async (msg) => {
-                if (!msg.rxdb || !Array.isArray(msg.rxdb.collections)) {
-                    node.error("msg.rxdb.collections must be a non-empty array");
+            node.on('input', (msg) => {
+                const collectionName = msg?.rxdb?.collection;
+
+                if (!collectionName) {
+                    node.error("Missing msg.rxdb.collection");
+                    return;
+                }
+                const collection = db.collections[collectionName];
+                if (!collection) {
+                    node.error(`Collection '${collectionName}' does not exist`);
                     return;
                 }
 
-                let limit = 0;
-                if (msg.rxdb.limit && !Number.isNaN(parseInt(msg.rxdb.limit))) {
-                    limit = parseInt(msg.rxdb.limit);
+                // Only resubscribe if collection name changed
+                if (node._currentCollectionName === collectionName && node._subscription) {
+                    node.log(`[RxDB] Already watching '${collectionName}', skipping re-subscribe.`);
+                    return;
                 }
 
-                const result = {};
-
-                for (const collectionName of msg.rxdb.collections) {
-                    const collection = db.collections[collectionName];
-                    if (!collection) {
-                        node.error(`Collection '${collectionName}' does not exist`);
-                        return;
-                    }
-
-                    node.status({ fill: "yellow", shape: "dot", text: `Reading ${collectionName}` });
-                    const docs = await collection.find().limit(limit).exec();
-                    result[collectionName] = docs;
+                // Unsubscribe from any previous
+                if (node._subscription) {
+                    node._subscription.unsubscribe();
+                    node.log(`[RxDB] Unsubscribed from '${node._currentCollectionName}'`);
                 }
 
-                msg.payload = result;
-                node.send(msg);
-                node.status({ fill: "green", shape: "dot", text: "Read complete" });
+                node._currentCollectionName = collectionName;
+
+                node.status({ fill: "blue", shape: "dot", text: `👀 Watching ${collectionName}` });
+
+                node._subscription = collection.find().$.subscribe(changeEvent => {
+                    if (!changeEvent) return;
+
+                    node.send({
+                        payload: changeEvent,
+                        collection: collectionName,
+                        topic: 'rxdb-change'
+                    });
+                });
+
+
+                node.log(`[RxDB] Subscribed to '${collectionName}'`);
             });
+
+            node.on('close', () => {
+                if (node._subscription) {
+                    node._subscription.unsubscribe();
+                    node.log(`[RxDB] Unsubscribed from '${node._currentCollectionName}' on node close.`);
+                }
+                node.status({ fill: "grey", shape: "ring", text: "Stopped" });
+            });
+
         }).catch(err => {
             node.status({ fill: "red", shape: "ring", text: "DB Init failed" });
             node.error("RxDB init failed", err);
         });
     }
 
-    RED.nodes.registerType("rxdb-read", RxDBReadNode);
+    RED.nodes.registerType("rxdb-watch", RxDBWatchNode);
 };

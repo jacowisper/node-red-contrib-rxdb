@@ -59,7 +59,7 @@ module.exports = function (RED) {
                             }
 
                             try {
-                                replicateServer({
+                                const repstate = replicateServer({
                                     collection: db.collections[name],
                                     replicationIdentifier: `replication-${name}`,
                                     url: config.replicationUrl,
@@ -67,6 +67,11 @@ module.exports = function (RED) {
                                     pull: {},
                                     live: true
                                 });
+
+
+
+
+                                setInterval(() => repstate.reSync(), 60 * 1000);
 
                                 replicated.push(name);
                             } catch (repErr) {
