@@ -1,0 +1,35 @@
+<script type="text/javascript">
+    RED.nodes.registerType('rxdb-delete', {
+        category: 'RXDB',
+        color: '#f8d7da',
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-trash",
+        label: function () {
+            return this.name || "RxDB Delete";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="rxdb-delete">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="RxDB Delete Node">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="rxdb-delete">
+    <p>
+        Deletes a document from an RxDB collection.
+    </p>
+    <p>
+        Set <code>msg.rxdb.collection</code> to specify the target collection.
+        Set <code>msg.payload._id</code> or <code>msg.payload.id</code> to specify the document ID to delete.
+    </p>
+    <p>
+        If the document exists, it will be removed. If not, the node reports it was not found.
+    </p>
+</script>
