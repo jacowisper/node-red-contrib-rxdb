@@ -2,7 +2,7 @@
 
  
 
-A custom Node-RED node set for building low-code, reactive database flows using [RxDB](https://rxdb.info/) backed by **FoundationDB**.
+A custom Node-RED node set for building low-code, reactive database flows using [RxDB](https://rxdb.info/) backed by **MongoDB**.
 
 ---
 
@@ -10,9 +10,9 @@ A custom Node-RED node set for building low-code, reactive database flows using 
 
 This package includes Node-RED nodes that:
 
-- Dynamically manage RxDB collections and schemas at runtime
-- Support reading, writing, watching, and replicating changes
-- Use FoundationDB 7.2 as a fast, durable backend
+- Dynamically manage RxDB collections and schemas at runtime  
+- Support reading, writing, watching, and replicating changes  
+- Use MongoDB as a durable, developer-friendly backend  
 - Allow full flow-based control — no static schemas required!
 
 ---
@@ -30,49 +30,56 @@ This package includes Node-RED nodes that:
 
 ## 🧰 Prerequisites
 
-To use this project with FoundationDB:
+To use this project with MongoDB:
 
-### ✅ 1. Install FoundationDB Client Libraries
+### ✅ 1. Install MongoDB via Docker
+
+If Docker is not already installed, follow instructions from [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
+
+Then pull and run a MongoDB container:
 
 ```bash
-sudo apt update
-wget https://github.com/apple/foundationdb/releases/download/7.2.5/foundationdb-clients_7.2.5-1_amd64.deb
-sudo mkdir -p /var/lib/foundationdb
-sudo dpkg -i foundationdb-clients_7.2.5-1_amd64.deb
+docker pull mongo
+docker run --name mongodb -d -p 27017:27017 -v /var/lib/mongodb:/data/db --restart always mongo
 ```
 
-### ✅ 2. Run a FoundationDB Server (API Version 7.2)
+### ✅ 2. Create an Admin User
+
+Enter the Mongo shell:
 
 ```bash
-docker run -d \
-  --name foundationdb \
-  --hostname foundationdb \
-  --restart unless-stopped \
-  -v fdb-data:/var/lib/foundationdb/data \
-  -v /opt/fdb-conf:/etc/foundationdb \
-  -p 4500:4500 \
-  foundationdb/foundationdb:7.2.5
+docker exec -it mongodb mongosh
 ```
 
-Then create and copy the cluster file to your host system:
+Then set up authentication:
 
-```bash
-docker exec -it foundationdb fdbcli
-configure new single ssd
+```javascript
+use admin
+db.createUser({
+  user: "your_username",
+  pwd: "your_password",
+  roles: [{ role: "root", db: "admin" }]
+})
 exit
-docker cp foundationdb:/var/fdb/fdb.cluster /opt/fdb-conf/fdb.cluster
-sudo cp /opt/fdb-conf/fdb.cluster /etc/foundationdb/fdb.cluster
+```
+
+### ✅ 3. Restart with Auth Enabled
+
+```bash
+docker stop mongodb
+docker rm mongodb
+docker run --name mongodb -d -p 27017:27017 -v /var/lib/mongodb:/data/db --restart always mongo mongod --auth
 ```
 
 ---
 
-## 🛠 Installation
+## 🚠 Installation
 
 From local directory:
 
 ```bash
 cd ~/.node-red
-npm install https://github.com/jacowisper/node-red-contrib-rxdb.git
+npm install /path/to/node-red-contrib-rxdb
 ```
 
 Then restart Node-RED:
@@ -123,6 +130,7 @@ Watches a collection for live updates:
 ```
 
 Output:
+
 ```json
 {
   "payload": {
@@ -150,18 +158,20 @@ Dynamically register collections:
 
 ## 📚 Features
 
-- 🔁 FoundationDB 7.2 support via RxDB
+- 🐒 MongoDB support via RxDB adapters
 - 🧩 Dynamic schema injection at runtime
 - 📡 Replication support (RxDB replication-server plugin)
 - 🧠 Smart instance caching (one shared RxDB connection)
 - 🛠 No external DB config nodes — flow-driven logic only
 
 ---
+
 ![alt text](image.png)
- 
+
 ---
 
 ## 📄 License
 
 **UNLICENSED**  
 No warranties. No attribution required. No restrictions.
+

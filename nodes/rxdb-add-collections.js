@@ -2,6 +2,8 @@ console.log('[rxdb] Loading add-collections node...');
 
 const { getRxDBInstance } = require('../lib/db');
 const { replicateServer } = require('rxdb-server/plugins/replication-server');
+const { firstValueFrom } = require('rxjs');
+const { filter } = require('rxjs/operators');
 
 module.exports = function (RED) {
     function RxDBAddCollectionsNode(config) {
@@ -38,7 +40,8 @@ module.exports = function (RED) {
 
                     collectionsToAdd[name] = {
                         schema: config.schema,
-                        autoMigrate: true
+                        autoMigrate: false,
+
                     };
                 }
 
@@ -46,41 +49,69 @@ module.exports = function (RED) {
                     if (Object.keys(collectionsToAdd).length > 0) {
                         await db.addCollections(collectionsToAdd);
                         added.push(...Object.keys(collectionsToAdd));
-                    }
 
-                    for (const [name, config] of Object.entries(payload)) {
-                        if (
-                            config.replicate === true &&
-                            db.collections[name]
-                        ) {
-                            if (!config.replicationUrl) {
-                                node.warn(`Collection '${name}' requested replication but no replicationUrl was provided`);
-                                continue;
-                            }
+                        for (const [name, config] of Object.entries(payload)) {
+                            if (
+                                config.replicate === true &&
+                                db.collections[name]
+                            ) {
+                                if (!config.replicationUrl) {
+                                    node.warn(`Collection '${name}' requested replication but no replicationUrl was provided`);
+                                    continue;
+                                }
 
-                            try {
-                                const repstate = replicateServer({
-                                    collection: db.collections[name],
-                                    replicationIdentifier: `replication-${name}`,
-                                    url: config.replicationUrl,
-                                    push: {},
-                                    pull: {},
-                                    live: true
-                                });
+                                try {
 
 
 
+                                    const repstate = replicateServer({
+                                        collection: db.collections[name],
+                                        replicationIdentifier: `replication-${name}`,
+                                        url: config.replicationUrl,
+                                        push: {},
+                                        pull: {},
 
-                                setInterval(() => repstate.reSync(), 60 * 1000);
+                                        live: true
+                                    });
 
-                                replicated.push(name);
-                            } catch (repErr) {
-                                node.warn(`Replication failed for '${name}': ${repErr.message}`);
-                                errors.push({ collection: name, error: repErr.message });
+                                    setInterval(() => repstate.reSync(), 60 * 1000);
+                                    replicated.push(name);
+
+                                    /* 
+                                                                        repstate.active$.subscribe(isActive => {
+                                                                            if (isActive) {
+                                                                                node.status({
+                                                                                    fill: "blue",
+                                                                                    shape: "dot",
+                                                                                    text: `🔁 Syncing: ${name}`
+                                                                                });
+                                                                            } else {
+                                                                                node.status({
+                                                                                    fill: "green",
+                                                                                    shape: "dot",
+                                                                                    text: `✔ Synced: ${name}`
+                                                                                });
+                                                                            }
+                                                                        }); */
+
+                                    /*   repstate.error$.subscribe(err => {
+                                          node.status({
+                                              fill: "red",
+                                              shape: "ring",
+                                              text: `❌ Error: ${name}`
+                                          });
+                                          node.warn(`Replication error in '${name}': ${err?.message}`);
+                                          errors.push({ collection: name, error: err?.message });
+                                      }); */
+
+                                } catch (repErr) {
+                                    node.warn(`Replication failed for '${name}': ${repErr.message}`);
+                                    errors.push({ collection: name, error: repErr.message });
+                                }
+
                             }
                         }
                     }
-
                     msg.payload = {
                         status: "ok",
                         added,
@@ -99,6 +130,7 @@ module.exports = function (RED) {
                 } catch (err) {
                     node.status({ fill: "red", shape: "ring", text: "Add failed" });
                     node.error("Failed to add collections", err);
+                    node.error(err);
                 }
             });
 

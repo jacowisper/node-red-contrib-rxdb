@@ -40,19 +40,29 @@ module.exports = function (RED) {
                     node.log(`[RxDB] Unsubscribed from '${node._currentCollectionName}'`);
                 }
 
-                node._currentCollectionName = collectionName;
-
-                node.status({ fill: "blue", shape: "dot", text: `👀 Watching ${collectionName}` });
-
                 node._subscription = collection.find().$.subscribe(changeEvent => {
                     if (!changeEvent) return;
 
+                    let docData = null;
+
+                    if (changeEvent.documentData) {
+                        docData = changeEvent.documentData; // Already plain object
+                    } else if (changeEvent.doc && typeof changeEvent.doc.toJSON === 'function') {
+                        docData = changeEvent.doc.toJSON(false);
+                    }
+
                     node.send({
-                        payload: changeEvent,
+                        payload: {
+                            event: changeEvent.operation,
+                            doc: docData,
+                            id: changeEvent.id,
+                            timestamp: changeEvent.startTime || Date.now()
+                        },
                         collection: collectionName,
                         topic: 'rxdb-change'
                     });
                 });
+
 
 
                 node.log(`[RxDB] Subscribed to '${collectionName}'`);

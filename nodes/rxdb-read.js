@@ -8,7 +8,7 @@ module.exports = function (RED) {
         const node = this;
 
         getRxDBInstance().then(db => {
-            node.status({ fill: "green", shape: "dot", text: "Foundation ready" });
+            node.status({ fill: "green", shape: "dot", text: "Mongo ready" });
 
             node.on('input', async (msg) => {
                 if (!msg.rxdb || !(msg.rxdb.collection)) {
@@ -64,7 +64,14 @@ module.exports = function (RED) {
 
 
 
-                msg.payload = docs;
+                if (Array.isArray(docs)) {
+                    msg.payload = docs.map(doc =>
+                        typeof doc.toJSON === 'function' ? doc.toJSON(false) : doc
+                    );
+                } else {
+                    // Count returns a number, not an array
+                    msg.payload = docs;
+                }
 
                 node.send(msg);
                 node.status({ fill: "green", shape: "dot", text: "Read complete" });
