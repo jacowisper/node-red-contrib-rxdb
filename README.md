@@ -6,18 +6,18 @@ A custom Node-RED node set for building low-code, reactive database flows using 
 
 ---
 
-## 🚀 Overview
+## Overview
 
 This package includes Node-RED nodes that:
 
 - Dynamically manage RxDB collections and schemas at runtime  
 - Support reading, writing, watching, and replicating changes  
 - Use MongoDB as a durable, developer-friendly backend  
-- Allow full flow-based control — no static schemas required!
+- Allow full flow-based control -- no static schemas required!
 
 ---
 
-## 📦 Included Nodes
+## Included Nodes
 
 | Node                   | Purpose                                       |
 |------------------------|-----------------------------------------------|
@@ -28,11 +28,11 @@ This package includes Node-RED nodes that:
 
 ---
 
-## 🧰 Prerequisites
+## Prerequisites
 
 To use this project with MongoDB:
 
-### ✅ 1. Install MongoDB via Docker
+### 1. Install MongoDB via Docker
 
 If Docker is not already installed, follow instructions from [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
 
@@ -43,7 +43,7 @@ docker pull mongo
 docker run --name mongodb -d -p 27017:27017 -v /var/lib/mongodb:/data/db --restart always mongo
 ```
 
-### ✅ 2. Create an Admin User
+### 2. Create an Admin User
 
 Enter the Mongo shell:
 
@@ -63,7 +63,7 @@ db.createUser({
 exit
 ```
 
-### ✅ 3. Restart with Auth Enabled
+### 3. Restart with Auth Enabled
 
 ```bash
 docker stop mongodb
@@ -73,7 +73,7 @@ docker run --name mongodb -d -p 27017:27017 -v /var/lib/mongodb:/data/db --resta
 
 ---
 
-## 🚠 Installation
+## Installation
 
 From local directory:
 
@@ -90,9 +90,9 @@ node-red-restart
 
 ---
 
-## 🔧 Node Usage
+## Node Usage
 
-### 🟢 `rxdb-read`
+### `rxdb-read`
 
 Reads one or more collections:
 
@@ -105,7 +105,7 @@ Reads one or more collections:
 }
 ```
 
-### ✏️ `rxdb-write`
+### `rxdb-write`
 
 Writes a document to a collection:
 
@@ -119,7 +119,7 @@ Writes a document to a collection:
 }
 ```
 
-### 👀 `rxdb-watch`
+### `rxdb-watch`
 
 Watches a collection for live updates:
 
@@ -140,7 +140,7 @@ Output:
 }
 ```
 
-### 🛠️ `rxdb-add-collections`
+### `rxdb-add-collections`
 
 Dynamically register collections:
 
@@ -156,13 +156,13 @@ Dynamically register collections:
 
 ---
 
-## 📚 Features
+## Features
 
-- 🐒 MongoDB support via RxDB adapters
-- 🧩 Dynamic schema injection at runtime
-- 📡 Replication support (RxDB replication-server plugin)
-- 🧠 Smart instance caching (one shared RxDB connection)
-- 🛠 No external DB config nodes — flow-driven logic only
+- MongoDB support via RxDB adapters
+- Dynamic schema injection at runtime
+- Replication support (RxDB replication-server plugin)
+- Smart instance caching (one shared RxDB connection)
+- No external DB config nodes -- flow-driven logic only
 
 ---
 
@@ -170,7 +170,7 @@ Dynamically register collections:
 
 ---
 
-## 📄 License
+## License
 
 **UNLICENSED**  
 No warranties. No attribution required. No restrictions.
